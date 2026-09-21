@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+  appointments Appointment[]
+}
+
+model Appointment {
+  id        Int @id @default(autoincrement())
+  dateTime  DateTime
+  status    AppointmentStatus @default(PENDING)
+  userId    Int
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
