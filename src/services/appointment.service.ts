@@ -12,6 +12,19 @@ export const getAllAppointmentsService = async () => {
     });
 };
 
+//Ese trae solo los turnos de un usuario específico.
+export const getAppointmentsByUserService = async (userId: number) => {
+
+    return await prisma.appointment.findMany({
+        where: {
+            userId
+        },
+        include: {
+            user: true
+        }
+    });
+};
+
 
 //Busca un turno por ID.
 export const getAppointmentByIdService = async (id: number) => {

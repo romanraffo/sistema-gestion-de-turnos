@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 
 import {
-    getAllAppointmentsService,
+    getAppointmentsByUserService,
     getAppointmentByIdService,
     findAppointmentConflictService,
     createAppointmentService,
@@ -16,18 +16,36 @@ import {
 //controllers. Responde: ¿Qué vino en la request y qué response tengo que devolver?
 
 //GET - Trae todos los turnos.
-export const getAppointments = async (req: Request, res: Response) => {
+export const getAppointments = async (
+    req: Request,
+    res: Response
+) => {
 
-    const appointments = await getAllAppointmentsService();
+    const userId = req.user?.userId;
+
+    if (userId === undefined) {
+        return res.status(401).json({
+            message: "Usuario no autenticado."
+        });
+    }
+
+    const appointments =
+        await getAppointmentsByUserService(userId);
 
     return res.status(200).json(appointments);
 };
 
 
 //GET - Trae un turno por ID.
-export const getAppointmentById = async (req: Request, res: Response) => {
+export const getAppointmentById = async (
+    req: Request,
+    res: Response
+) => {
 
     const id = Number(req.params.id);
+
+    const userId = req.user?.userId;
+
 
     if (Number.isNaN(id)) {
         return res.status(400).json({
@@ -35,7 +53,16 @@ export const getAppointmentById = async (req: Request, res: Response) => {
         });
     }
 
+
+    if (userId === undefined) {
+        return res.status(401).json({
+            message: "Usuario no autenticado."
+        });
+    }
+
+
     const appointment = await getAppointmentByIdService(id);
+
 
     if (appointment === null) {
         return res.status(404).json({
@@ -43,20 +70,37 @@ export const getAppointmentById = async (req: Request, res: Response) => {
         });
     }
 
+
+    //Verificamos que el turno pertenezca al usuario autenticado.
+    if (appointment.userId !== userId) {
+        return res.status(403).json({
+            message: "No tenés permiso para ver este turno."
+        });
+    }
+
+
     return res.status(200).json(appointment);
 };
 
 
 //POST - Crea un turno y lo vincula al usuario.
-export const createAppointment = async (req: Request, res: Response) => {
+export const createAppointment = async (
+    req: Request,
+    res: Response
+) => {
 
-    const { userId, dateTime } = req.body;
+    const { dateTime } = req.body;
 
 
-    if (typeof userId !== "number" || Number.isNaN(userId)) {
+    //El middleware de autenticación agregó
+    //los datos del usuario a req.user.
+    const userId = req.user?.userId;
 
-        return res.status(400).json({
-            message: "El ID debe ser un número válido."
+
+    if (userId === undefined) {
+
+        return res.status(401).json({
+            message: "Usuario no autenticado."
         });
     }
 
@@ -69,11 +113,9 @@ export const createAppointment = async (req: Request, res: Response) => {
     }
 
 
-    //Transformamos el string recibido a Date.
     const parsedDate = new Date(dateTime);
 
 
-    //Si getTime devuelve NaN, la fecha es inválida.
     if (Number.isNaN(parsedDate.getTime())) {
 
         return res.status(400).json({
@@ -82,7 +124,6 @@ export const createAppointment = async (req: Request, res: Response) => {
     }
 
 
-    //No permitimos reservar fechas pasadas.
     if (parsedDate < new Date()) {
 
         return res.status(400).json({
@@ -91,19 +132,17 @@ export const createAppointment = async (req: Request, res: Response) => {
     }
 
 
-    //Verificamos que el usuario exista.
     const user = await getUserByIdService(userId);
 
 
     if (user === null) {
 
         return res.status(404).json({
-            message: "No existe un usuario con ese ID."
+            message: "El usuario autenticado no existe."
         });
     }
 
 
-    //Buscamos si ya existe un turno activo en esa fecha.
     const existingAppointment =
         await findAppointmentConflictService(parsedDate);
 
@@ -117,7 +156,10 @@ export const createAppointment = async (req: Request, res: Response) => {
 
 
     const appointmentCreate =
-        await createAppointmentService(userId, parsedDate);
+        await createAppointmentService(
+            userId,
+            parsedDate
+        );
 
 
     return res.status(201).json({
@@ -159,6 +201,27 @@ export const updateAppointment = async (req: Request, res: Response) => {
 
         return res.status(404).json({
             message: "El turno no existe."
+        });
+    }
+
+
+    //Obtenemos el usuario autenticado desde el JWT.
+    const userId = req.user?.userId;
+
+
+    if (userId === undefined) {
+
+        return res.status(401).json({
+            message: "Usuario no autenticado."
+        });
+    }
+
+
+    //Verificamos que el turno pertenezca al usuario autenticado.
+    if (appointment.userId !== userId) {
+
+        return res.status(403).json({
+            message: "No tenés permiso para modificar este turno."
         });
     }
 
