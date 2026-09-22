@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 import {
     getAllUsers,
@@ -13,11 +13,22 @@ import {
 //controllers. Responde: ¿Qué vino en la request y qué response tengo que devolver?
 
 //GET - Devuelve todos los usuarios.
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
 
-    const users = await getAllUsers();
+    try {
 
-    return res.status(200).json(users);
+        const users = await getAllUsers();
+
+        return res.status(200).json(users);
+
+    } catch (error) {
+
+        next(error);
+    }
 };
 
 
@@ -65,41 +76,6 @@ export const getUsersByName = async (req: Request, res: Response) => {
 
     return res.status(200).json(users);
 };
-
-
-//POST - Crea un usuario.
-export const createUser = async (req: Request, res: Response) => {
-
-    const { name, email } = req.body;
-
-    if (
-        typeof name !== "string" ||
-        name.trim() === "" ||
-        typeof email !== "string" ||
-        email.trim() === ""
-    ) {
-        return res.status(400).json({
-            message: "Name y email son obligatorios y deben ser texto."
-        });
-    }
-
-    //Verificamos que el email no esté registrado.
-    const existingUser = await getUserByEmailService(email);
-
-    if (existingUser !== null) {
-        return res.status(409).json({
-            message: "Ya existe un usuario registrado con ese email."
-        });
-    }
-
-    const user = await createUserService(name, email);
-
-    return res.status(201).json({
-        message: "Usuario creado correctamente.",
-        user
-    });
-};
-
 
 //PATCH - Actualiza el nombre del usuario.
 export const updateUser = async (req: Request, res: Response) => {

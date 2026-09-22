@@ -7,7 +7,14 @@ export const getAllAppointmentsService = async () => {
 
     return await prisma.appointment.findMany({
         include: {
-            user: true
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true
+                }
+            }
         }
     });
 };
@@ -20,7 +27,14 @@ export const getAppointmentsByUserService = async (userId: number) => {
             userId
         },
         include: {
-            user: true
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true
+                }
+            }
         }
     });
 };
@@ -34,7 +48,14 @@ export const getAppointmentByIdService = async (id: number) => {
             id
         },
         include: {
-            user: true
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true
+                }
+            }
         }
     });
 };

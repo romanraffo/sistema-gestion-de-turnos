@@ -56,7 +56,8 @@ export const comparePasswordService = async (
 //Genera un token JWT.
 export const generateTokenService = (
     userId: number,
-    email: string
+    email: string,
+    role: string
 ) => {
 
     const secret = process.env.JWT_SECRET;
@@ -68,7 +69,8 @@ export const generateTokenService = (
     return jwt.sign(
         {
             userId,
-            email
+            email,
+            role
         },
         secret,
         {

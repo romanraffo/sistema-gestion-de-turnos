@@ -12,6 +12,7 @@ model User {
   name         String
   email        String @unique
   password     String
+  role         UserRole @default(USER)
   appointments Appointment[]
 }
 
@@ -28,4 +29,9 @@ enum AppointmentStatus {
   PENDING
   CONFIRMED
   CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }

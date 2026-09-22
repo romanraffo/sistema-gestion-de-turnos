@@ -4,7 +4,6 @@ import {
     getUsers,
     getUserById,
     getUsersByName,
-    createUser,
     updateUser,
     deleteUser
 } from "../controllers/user.controller";
@@ -23,11 +22,6 @@ router.get("/id/:id", getUserById);
 
 //Busca usuarios por nombre.
 router.get("/name/:name", getUsersByName);
-
-
-//Crea usuario.
-router.post("/", createUser);
-
 
 //Actualiza usuario.
 router.patch("/id/:id", updateUser);

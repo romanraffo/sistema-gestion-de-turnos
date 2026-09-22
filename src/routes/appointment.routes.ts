@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/auth.middleware";
+import { requireAdmin } from "../middlewares/role.middleware";
 
 import {
+    getAllAppointmentsAdmin,
     getAppointments,
     getAppointmentById,
     createAppointment,
@@ -16,6 +18,13 @@ const router = Router();
 //Trae todos los turnos.
 router.get("/", authenticateToken, getAppointments);
 
+//Admin que ve todos los turnos 
+router.get(
+    "/admin/all",
+    authenticateToken,
+    requireAdmin,
+    getAllAppointmentsAdmin
+);
 
 //Trae un turno por ID.
 router.get("/:id", authenticateToken, getAppointmentById);

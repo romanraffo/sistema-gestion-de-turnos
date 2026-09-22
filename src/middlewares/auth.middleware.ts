@@ -61,7 +61,9 @@ export const authenticateToken = (
 
         if (
             typeof decoded === "string" ||
-            typeof decoded.userId !== "number"
+            typeof decoded.userId !== "number" ||
+            typeof decoded.email !== "string" ||
+            typeof decoded.role !== "string"
         ) {
             return res.status(401).json({
                 message: "Token inválido."
@@ -72,7 +74,8 @@ export const authenticateToken = (
         //Guardamos los datos del usuario dentro de la request.
         req.user = {
             userId: decoded.userId,
-            email: decoded.email
+            email: decoded.email,
+            role: decoded.role
         };
 
 
