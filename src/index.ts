@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 import userRoutes from "./routes/user.routes.js";
 import appointmentRoutes from "./routes/appointment.routes.js";
@@ -11,6 +12,10 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 const PORT = 3000;
+
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
 
 app.use(express.json());
 

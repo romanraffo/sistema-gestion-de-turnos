@@ -141,7 +141,15 @@ export const loginUser = async (
 
         return res.status(200).json({
             message: "Login correcto.",
-            token
+
+            token,
+
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (error) {

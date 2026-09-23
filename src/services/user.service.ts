@@ -5,67 +5,122 @@ import prisma from "../lib/prisma";
 
 //Trae todos los usuarios.
 export const getAllUsers = async () => {
-    return await prisma.user.findMany();
+    return await prisma.user.findMany({
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+        }
+    });
 };
 
 //Busca un usuario por ID.
 export const getUserByIdService = async (id: number) => {
-    return await prisma.user.findUnique({
-        where: {
-            id
-        }
-    });
+  return await prisma.user.findUnique({
+    where: {
+      id
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
+
 
 //Busca usuarios por nombre.
 export const getUsersByNameService = async (name: string) => {
-    return await prisma.user.findMany({
-        where: {
-            name: {
-                equals: name,
-                mode: "insensitive"
-            }
-        }
-    });
+  return await prisma.user.findMany({
+    where: {
+      name: {
+        equals: name,
+        mode: "insensitive"
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
+
 
 //Busca usuario por email.
 export const getUserByEmailService = async (email: string) => {
-    return await prisma.user.findUnique({
-        where: {
-            email
-        }
-    });
+  return await prisma.user.findUnique({
+    where: {
+      email
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
+
 
 //Crea un usuario.
-export const createUserService = async (name: string, email: string, password: string) => {
-    return await prisma.user.create({
-        data: {
-            name,
-            email,
-            password
-        }
-    });
+export const createUserService = async (
+  name: string,
+  email: string,
+  password: string
+) => {
+  return await prisma.user.create({
+    data: {
+      name,
+      email,
+      password
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
 
+
 //Actualiza el nombre de un usuario.
-export const updateUserService = async (id: number, name: string) => {
-    return await prisma.user.update({
-        where: {
-            id
-        },
-        data: {
-            name
-        }
-    });
+export const updateUserService = async (
+  id: number,
+  name: string
+) => {
+  return await prisma.user.update({
+    where: {
+      id
+    },
+    data: {
+      name
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
+
 
 //Elimina un usuario.
 export const deleteUserService = async (id: number) => {
-    return await prisma.user.delete({
-        where: {
-            id
-        }
-    });
+  return await prisma.user.delete({
+    where: {
+      id
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true
+    }
+  });
 };
