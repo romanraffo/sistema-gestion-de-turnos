@@ -1,5 +1,8 @@
 import { Router } from "express";
 
+import { authenticateToken } from "../middlewares/auth.middleware";
+import { requireAdmin } from "../middlewares/role.middleware";
+
 import {
     getUsers,
     getUserById,
@@ -10,25 +13,24 @@ import {
 
 const router = Router();
 
-//routes. Responde: ¿Qué endpoints existen? define qué endpoints existen y qué controller atiende cada uno.
+// Todas las rutas de usuarios requieren autenticación.
+router.use(authenticateToken);
 
-//Trae todos los usuarios.
-router.get("/", getUsers);
+// Todas las operaciones de usuarios requieren rol ADMIN.
 
+// Trae todos los usuarios.
+router.get("/", requireAdmin, getUsers);
 
-//Busca usuario por ID.
-router.get("/id/:id", getUserById);
+// Busca usuario por ID.
+router.get("/id/:id", requireAdmin, getUserById);
 
+// Busca usuarios por nombre.
+router.get("/name/:name", requireAdmin, getUsersByName);
 
-//Busca usuarios por nombre.
-router.get("/name/:name", getUsersByName);
+// Actualiza usuario.
+router.patch("/id/:id", requireAdmin, updateUser);
 
-//Actualiza usuario.
-router.patch("/id/:id", updateUser);
-
-
-//Elimina usuario.
-router.delete("/:id", deleteUser);
-
+// Elimina usuario.
+router.delete("/:id", requireAdmin, deleteUser);
 
 export default router;

@@ -266,20 +266,20 @@ export const updateAppointment = async (
 
 
         // Obtenemos el usuario autenticado desde el JWT.
-        const userId = req.user?.userId;
-
-
-        if (userId === undefined) {
+        // Obtenemos el usuario autenticado desde el JWT.
+        if (!req.user) {
             return res.status(401).json({
                 message: "Usuario no autenticado."
             });
         }
 
+        const user = req.user;
+        const userId = user.userId;
 
         // Si NO es ADMIN,
         // solo puede modificar sus propios turnos.
         if (
-            req.user?.role !== "ADMIN" &&
+            user.role !== "ADMIN" &&
             appointment.userId !== userId
         ) {
             return res.status(403).json({
@@ -364,7 +364,15 @@ export const updateAppointment = async (
                     message: "El STATUS ingresado no es válido."
                 });
             }
-        }
+            if (
+                user.role !== "ADMIN" &&
+                status !== "CANCELLED"
+            ) {
+                return res.status(403).json({
+                    message: "No tenés permiso para establecer ese estado."
+                });
+            }
+            }
 
 
         // Armamos solamente los campos
